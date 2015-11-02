@@ -18,19 +18,19 @@ puts "Server started: http://localhost:#{port}/"
 root = File.expand_path './public'
 server = WEBrick::HTTPServer.new Port: port, DocumentRoot: root
 
-server.mount_proc '/api/places' do |req, res|
-  places = JSON.parse(File.read('./places.json', encoding: 'UTF-8'))
+server.mount_proc '/api/countries' do |req, res|
+  countries = JSON.parse(File.read('./countries.json', encoding: 'UTF-8'))
 
   if req.request_method == 'POST'
     # Assume it's well formed
-    place = {}
+    country = {}
     req.query.each do |key, value|
-      place[key] = value.force_encoding('UTF-8')
+      country[key] = value.force_encoding('UTF-8')
     end
-    places << place
+    countries << country
     File.write(
-      './places.json',
-      JSON.pretty_generate(places, indent: '    '),
+      './countries.json',
+      JSON.pretty_generate(countries, indent: '    '),
       encoding: 'UTF-8'
     )
   end
@@ -38,7 +38,7 @@ server.mount_proc '/api/places' do |req, res|
   # always return json
   res['Content-Type'] = 'application/json'
   res['Cache-Control'] = 'no-cache'
-  res.body = JSON.generate(places)
+  res.body = JSON.generate(countries)
 end
 
 trap('INT') { server.shutdown }
